@@ -1,15 +1,18 @@
 //Variables
 const gallery = document.getElementById('gallery');
 const body = document.getElementsByTagName('body');
+const searchContainer = document.querySelector('.search-container');
 let employeeData;
 
-fetch('https://randomuser.me/api/?results=12')
+fetch('https://randomuser.me/api/?results=12&nat=us')
     .then(data => data.json())
     .then(data => generateHTML(data))
     .then(data => interactivity(data))
-
-
+/*
 //Generates HTML for each random user pulled
+@para Brings in data from API request
+Returns HTML formatted data
+*/
 function generateHTML(data) {
     employeeData = data.results;
     employeeData.forEach(employee => {
@@ -26,6 +29,8 @@ function generateHTML(data) {
         </div>`
         gallery.innerHTML += (employeePost);
     });
+    addSearchBar();
+    search();
     return employeeData;
 }
 
@@ -38,7 +43,7 @@ returns Modal window
 **/
 function generateModal(index) {
     const employeeModal = document.createElement('div');
-    employeeModal.setAttribute('id','special');
+    employeeModal.setAttribute('id', 'special');
     gallery.appendChild(employeeModal);
     employee = employeeData[index];
     employeeProfile = `
@@ -73,7 +78,7 @@ function generateModal(index) {
  */
 
 function interactivity(data) {
-   const card = document.querySelectorAll('#gallery .card');
+    const card = document.querySelectorAll('#gallery .card');
     for (let i = 0; i < card.length; i += 1) {
         card[i].addEventListener('click', function () {
             generateModal(i);
@@ -91,7 +96,6 @@ function interactivityButton(index) {
     const next = document.querySelector('#modal-next');
     const close = document.querySelector('#modal-close-btn');
     const modal = document.querySelector('#special');
-    console.log(modal);
 
     if (index <= 0) {
         prev.style.display = 'none';
@@ -119,5 +123,77 @@ function interactivityButton(index) {
         gallery.removeChild(modal);
         generateModal(index);
     })
-    
+
+}
+/*
+ *Adds search input to page
+ */
+function addSearchBar(data) {
+    const searchDiv = document.createElement('div');
+    let search = `
+    <form action="#" method="get">
+    <input type="search" id="search-input" class="search-input" placeholder="Search by Name...">
+    <input type="submit" value="&#x1F50D;" id="serach-submit" class="search-submit">
+</form>`
+    searchDiv.innerHTML = search;
+    searchContainer.appendChild(searchDiv);
+}
+
+function search() {
+    const card = document.querySelectorAll('.card');
+    const name = document.querySelectorAll('#name');
+    const search = document.querySelector('#search-input');
+    const searchSubmit = document.querySelector('#serach-submit');
+    const displayDiv = document.createElement('div');
+    console.log(searchSubmit);
+    displayDiv.innerHTML = `<p>There are no employees by that name. To start over, clear the search bar and press enter.</p>`;
+    displayDiv.classList.add('hide');
+    gallery.appendChild(displayDiv);
+
+    //Adds activate search
+    search.addEventListener('keyup', () => {
+        let searchValue = search.value.toLowerCase();
+        for (let i = 0; i < card.length; i += 1) {         
+            let nameValue = name[i].textContent.toLowerCase();
+            if (nameValue.includes(searchValue)) {
+                card[i].classList.add('show');
+                card[i].classList.remove('hide');
+            } else {
+                card[i].classList.add('hide');
+                card[i].classList.remove('show');
+
+            }
+        }
+        let displayValue = document.querySelectorAll('.hide');
+        if(displayValue.length > card.length){
+            displayDiv.classList.add('show');
+            displayDiv.classList.remove('hide');
+        } else {
+            displayDiv.classList.remove('show');
+            displayDiv.classList.add('hide');
+        }
+    })
+    //Adds submit search
+    searchSubmit.addEventListener('click', ()=> {
+        let searchValue = search.value.toLowerCase();
+        for (let i = 0; i < card.length; i += 1) {         
+            let nameValue = name[i].textContent.toLowerCase();
+            if (nameValue.includes(searchValue)) {
+                card[i].classList.add('show');
+                card[i].classList.remove('hide');
+            } else {
+                card[i].classList.add('hide');
+                card[i].classList.remove('show');
+
+            }
+        }
+        let displayValue = document.querySelectorAll('.hide');
+        if(displayValue.length > card.length){
+            displayDiv.classList.add('show');
+            displayDiv.classList.remove('hide');
+        } else {
+            displayDiv.classList.remove('show');
+            displayDiv.classList.add('hide');
+        }
+    })
 }
